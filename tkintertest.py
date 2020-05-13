@@ -73,6 +73,7 @@ def rainbow_cycle(wait):
 
 index = 0
 def tick(time1=''):
+    global index
     time2 = dates[index][:10]
     index = (index + 1)%len(dates)
     #time2 = time.strftime('%I:%M:%S')

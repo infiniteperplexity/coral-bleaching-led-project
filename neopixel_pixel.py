@@ -7,11 +7,11 @@ import board
 import neopixel
 
 # Configure the setup
-PIXEL_PIN = board.D1  # pin that the NeoPixel is connected to
+PIXEL_PIN = board.D18  # pin that the NeoPixel is connected to
 ORDER = neopixel.RGB  # pixel color channel order
 COLOR = (100, 50, 150)  # color to blink
 CLEAR = (0, 0, 0)  # clear (or second color)
-DELAY = 0.25  # blink rate in seconds
+DELAY = 1  # blink rate in seconds
 
 # Create the NeoPixel object
 pixel = neopixel.NeoPixel(PIXEL_PIN, 1, pixel_order=ORDER)
@@ -19,6 +19,10 @@ pixel = neopixel.NeoPixel(PIXEL_PIN, 1, pixel_order=ORDER)
 # Loop forever and blink the color
 while True:
     pixel[0] = COLOR
-    time.sleep(DELAY)
+    #pixel.show()
+    print("HI")
+    time.sleep(1)
     pixel[0] = CLEAR
-    time.sleep(DELAY)
+    #pixel.show()
+    print("LO")
+    time.sleep(1)

@@ -8,7 +8,7 @@ pixel_pin = board.D18
 num_pixels = 109
 ORDER = neopixel.GRB
 pixels = neopixel.NeoPixel(
-    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER
+    pixel_pin, num_pixels, brightness=1.0, auto_write=True, pixel_order=ORDER
 )
 
 path = 'C:/Users/infin/OneDrive/Documents/GitHub/neopixelpi/'
@@ -74,8 +74,9 @@ while True:
 	pygame.draw.rect(display_surface, black, blank)
 	pygame.draw.rect(display_surface, thermc, rect)
 	pygame.draw.circle(display_surface, thermc, (thermx, thermy), thermr, 0)
-	pixels.fill(thermc)
-	pixels.show()
+	print(dates[index])
+	pixels[10] = thermc
+	#pixels.show()
 	for event in pygame.event.get():
 		if event.type == QUIT:
 			pygame.quit()

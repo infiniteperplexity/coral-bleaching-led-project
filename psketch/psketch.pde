@@ -6,7 +6,7 @@ String path = "C:/Users/infin/OneDrive/Documents/GitHub/neopixelpi/";
 Table table;
 PFont font;
 int index = 0;
-int wait = 20;
+int wait = 50;
 long last = 0;
 
 void setup(){
@@ -28,13 +28,15 @@ void draw(){
   long now = millis();
   if (now - last >= wait)
   {
+    // this is how many "step" the time advances
+    int bump = int(now - last) / wait;
     TableRow tr = table.getRow(index);
-    int dhw = parseInt(tr.getString(3));
+    int dhw = parseInt(tr.getFloat(3));
     String date = tr.getString(0).substring(0,10);
     background(0, 0, 0);
     fill(0, 255, 0);
     //text(date, 250, 200);
-    text(now - last, 250, 250);
+    text(bump, 250, 250);
     fill(255*(1.0-bleach(dhw)), 0, 0);
     circle(375, 375, 150);
     try
@@ -45,8 +47,9 @@ void draw(){
     {
       ;
     }
+    index = (index + bump) % table.getRowCount();
     last = millis();
-    index += 1;
+    
   }
   //delay(wait);
 }

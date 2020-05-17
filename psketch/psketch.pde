@@ -7,6 +7,7 @@ Table table;
 PFont font;
 int index = 0;
 int wait = 20;
+long last = 0;
 
 void setup(){
   size(750, 750);
@@ -24,25 +25,30 @@ void setup(){
   }
 }
 void draw(){
-  TableRow tr = table.getRow(index);
-  int dhw = parseInt(tr.getString(3));
-  String date = tr.getString(0).substring(0,10);
-  background(0, 0, 0);
-  fill(0, 255, 0);
-  text(date, 250, 200);
-  fill(255*(1.0-bleach(dhw)), 0, 0);
-  circle(375, 375, 150);
-  try
+  long now = millis();
+  if (now - last >= wait)
   {
-    arduino.write(Math.round(255*(1.0-bleach(dhw))));
+    TableRow tr = table.getRow(index);
+    int dhw = parseInt(tr.getString(3));
+    String date = tr.getString(0).substring(0,10);
+    background(0, 0, 0);
+    fill(0, 255, 0);
+    //text(date, 250, 200);
+    text(now - last, 250, 250);
+    fill(255*(1.0-bleach(dhw)), 0, 0);
+    circle(375, 375, 150);
+    try
+    {
+      arduino.write(Math.round(255*(1.0-bleach(dhw))));
+    }
+    catch(Exception e)
+    {
+      ;
+    }
+    last = millis();
+    index += 1;
   }
-  catch(Exception e)
-  {
-    ;
-  }
-  
-  index += 1;
-  delay(wait);
+  //delay(wait);
 }
 
 float bleach(float dhw)

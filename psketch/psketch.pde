@@ -11,7 +11,9 @@ long last = 0;
 PImage img;
 ArrayList<Reef> reefs = new ArrayList<Reef>();
 
+//https://pae-paha.pacioos.hawaii.edu/erddap/griddap/dhw_5km.html
 //https://en.wikipedia.org/wiki/List_of_reefs
+//https://pae-paha.pacioos.hawaii.edu/erddap/griddap/dhw_5km.csv?CRW_DHW[(2020-01-01T12:00:00Z):1:(2020-05-17T12:00:00Z)][(17.175):1:(17.175)][(-87.325):1:(-87.325)],CRW_SST[(2020-01-01T12:00:00Z):1:(2020-05-17T12:00:00Z)][(17.175):1:(17.175)][(-87.325):1:(-87.325)]
 
 void setup(){
   reefs.add(new Reef(1249, 850));

@@ -65,6 +65,7 @@ void draw(){
     textFont(lcdFont);
     text(date, 35, 450);
     text(dhw, 85, 600);
+    text(temp, 85, 750);
     int health = parseInt(255*(1.0-bleach(dhw)));
     fill(0, health, 0);
     for (int i = 0; i < reefs.size(); i++)

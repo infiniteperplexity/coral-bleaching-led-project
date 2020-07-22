@@ -1,6 +1,7 @@
 import processing.serial.*;
 Serial arduino;
-String portName = "/dev/ttyACM0";
+//String portName = "/dev/ttyACM0";
+String portName;
 String path = "C:/Users/infin/OneDrive/Documents/GitHub/neopixelpi/";
 //string path = "/home/pi/Documents/GitHub/neopixelpi/";
 String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
@@ -32,7 +33,6 @@ void setup(){
   reefs.add(new Reef(455, 955, "Belize Barrier Reef", "belize"));
   shape = loadShape("Continents.svg");
   button = loadShape("button.svg");
-  
   fullScreen();
   
   font = loadFont("ArialMT-48.vlw");
@@ -43,6 +43,8 @@ void setup(){
   tick = 0;
   try
   {
+    portName = Serial.list()[0];
+    print(portName);
     arduino = new Serial(this, portName, 9600);
   }
   catch(Exception e)

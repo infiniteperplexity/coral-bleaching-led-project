@@ -6,6 +6,7 @@ String path = "C:/Users/infin/OneDrive/Documents/GitHub/neopixelpi/";
 //string path = "/home/pi/Documents/GitHub/neopixelpi/";
 String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 PFont font;
+PFont lcdTiny;
 PFont lcdFont;
 PFont lcdSmall;
 int index = 0;
@@ -18,6 +19,7 @@ ArrayList<Reef> reefs = new ArrayList<Reef>();
 int tick;
 float fade = 10;
 int selected = 0;
+boolean bookmarks = true;
 //https://pae-paha.pacioos.hawaii.edu/erddap/griddap/dhw_5km.html
 //https://en.wikipedia.org/wiki/List_of_reefs
 //https://pae-paha.pacioos.hawaii.edu/erddap/griddap/dhw_5km.csv?CRW_DHW[(2020-01-01T12:00:00Z):1:(2020-05-17T12:00:00Z)][(17.175):1:(17.175)][(-87.325):1:(-87.325)],CRW_SST[(2020-01-01T12:00:00Z):1:(2020-05-17T12:00:00Z)][(17.175):1:(17.175)][(-87.325):1:(-87.325)]
@@ -37,6 +39,7 @@ void setup(){
   
   font = loadFont("ArialMT-48.vlw");
   //DS-Digital by Dusit Supasawat
+  lcdTiny = createFont("DS-DIGI.TTF", 36);
   lcdSmall = createFont("DS-DIGI.TTF", 72);
   lcdFont = createFont("DS-DIGI.TTF", 144);
   img = loadImage("button.png");
@@ -102,6 +105,12 @@ void draw(){
     fill(0, 255, 0);
     text(nf(1.8*temp+32,2,2), 1450, 450+50);
     text(" F", 1775, 450+50);
+    if (bookmarks == true)
+    {
+      textFont(lcdTiny);
+      text("1987", 2100, 100);
+      text("2015", 2100, 200);
+    }
     tick += 1;
     for (int i = 0; i < reefs.size(); i++)
     {
@@ -129,6 +138,7 @@ void draw(){
       fill(0,0,0);
       shape(button,-radius,-radius,2*radius,2*radius);
       popMatrix();
+
     }
     
     colorMode(RGB);
@@ -191,6 +201,24 @@ void mousePressed() {
     if (Math.sqrt((mouseX - r.X)*(mouseX - r.X) + (mouseY - r.Y)*(mouseY - r.Y))<30)
     {
       selected = i;
+    }
+  }
+  if (bookmarks == true)
+  {
+    if (mouseX >= 2000)
+    {
+      if (mouseY >= 75 && mouseY <= 125)
+      {
+        selected = 0;
+        index = 647;
+      }
+      else if (mouseY >= 175 && mouseY < 225)
+      {
+        selected = 0;
+        index = 10874;
+        //7217 would be 2005
+        
+      }
     }
   }
 }

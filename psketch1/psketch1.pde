@@ -5,6 +5,8 @@ String portName;
 String path = "C:/Users/infin/OneDrive/Documents/GitHub/neopixelpi/";
 //string path = "/home/pi/Documents/GitHub/neopixelpi/";
 String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+int[] years = {0, 282, 647, 1012, 1378, 1743, 2108, 2473, 2839, 3204, 3569, 3934, 4300, 4665, 5030, 5395, 5761, 6126, 6491,
+                6856, 7222, 7587, 7952, 8317, 8683, 9048, 9413, 9778, 10144, 10509, 10874, 11239, 11605, 11970, 12335, 12700};
 PFont font;
 PFont lcdTiny;
 PFont lcdFont;
@@ -77,6 +79,7 @@ void draw(){
     String month = months[Integer.valueOf(date.substring(5,7))-1];
     background(0, 0, 0);
     stroke(0,0,0);
+    strokeWeight(1);
     //// World Map
     shape.disableStyle();
     fill(0,255,00);
@@ -135,12 +138,13 @@ void draw(){
 
     }
     stroke(0, 255, 0);
+    strokeWeight(5);
     int dashes = 24;
     float unit = PI/dashes;
     for (int i = 0; i < dashes; i++)
     {     
-      arc(214, 305, 75, 75, 2*i*unit, (2*i+1)*unit );
-      arc(342, 305, 75, 75, 2*i*unit, (2*i+1)*unit );
+      arc(214, 305, 80+2*sin(tick), 80+2*sin(tick), 2*i*unit, (2*i+0.5)*unit );
+      arc(342, 305, 80+2*sin(tick), 80+2*sin(tick), 2*i*unit, (2*i+0.5)*unit );
     }
     
     
@@ -191,6 +195,17 @@ class Reef
   }
 }
 
+int getYear()
+{
+  for (int i = years.length-1; i>=0; i--)
+  {
+    if (index >= years[i])
+    {
+      return i;
+    }
+  }
+  return 0;
+}
 void keyPressed()
 {
   exit();
@@ -205,22 +220,12 @@ void mousePressed() {
       selected = i;
     }
   }
-  if (bookmarks == true)
+  if (mouseX >= 214-45 && mouseX <= 214+45 && mouseY >= 305-45 && mouseY <= 305+45)
   {
-    if (mouseX >= 2000)
-    {
-      if (mouseY >= 75 && mouseY <= 125)
-      {
-        selected = 0;
-        index = 647;
-      }
-      else if (mouseY >= 175 && mouseY < 225)
-      {
-        selected = 0;
-        index = 10874;
-        //7217 would be 2005
-        
-      }
-    }
+    index = years[Math.max(0,getYear()-1)];
+  }
+  else if (mouseX >= 342-45 && mouseX <= 342+45 && mouseY >= 305-45 && mouseY <=305+45)
+  {
+    index = years[Math.min(getYear()+1, years.length-1)];
   }
 }

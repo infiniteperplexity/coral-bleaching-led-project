@@ -177,20 +177,11 @@ void setup() {
   //Serial.println("hello world");
   for (int i=0; i<SIDE; i++)
   {
-    for (int j=0; j<SIDE; j++)
-    {
-      // did I get square3 backwards?  if so I need to re-do a bunch of crap
-      // why did I do this as rotations of square3 in the first place?  That made no sense!
-      // new code that rotates the original two panels into intuitive configurations
-      square3[i][j] = square[i][j];
-      triangle4[i][j] = triangle[i][17-j];
-    }
-  }
-  for (int i=0; i<SIDE; i++)
-  {
     // **********This code rotates all the panels into their correct positions (should all be validated now) **********
     for (int j=0; j<SIDE; j++)
     {
+      square3[i][j] = square[i][j];
+      triangle4[i][j] = triangle[i][17-j];
       triangle1[i][j] = triangle[17-i][17-j];
       square2[i][j] = square[17-i][j];
       square5[i][j] = square[j][17-i];
@@ -344,8 +335,6 @@ void loop() {
     }
     digitalWrite(LED_BUILTIN, ledState);
   }
-  
-  //Serial.println(freeMemory());
   // we probably need a better way to choose patterns but this will do for now
   traverse_grid();
   strip.show();
@@ -372,9 +361,9 @@ void traverse_grid()
       {
         // this is where the actual pattern is defined...maybe should structure this differently
         int angle = xy2angle(i,j);
-        Serial.println(angle);
         int color = rainbow(angle);
-        strip.setPixelColor(pixel, color);
+        //strip.setPixelColor(pixel, color);
+        strip.setPixelColor(pixel, strip.Color(0,0,0));
       }
     }
   }

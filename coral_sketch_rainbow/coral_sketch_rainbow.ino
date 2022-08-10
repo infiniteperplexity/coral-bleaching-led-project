@@ -1,3 +1,5 @@
+// updated 8/10/2022
+
 #include <Adafruit_NeoPixel.h>
 
 #ifdef __AVR__
@@ -178,9 +180,9 @@ void setup() {
     for (int j=0; j<SIDE; j++)
     {
       // did I get square3 backwards?  if so I need to re-do a bunch of crap
+      // why did I do this as rotations of square3 in the first place?  That made no sense!
       // new code that rotates the original two panels into intuitive configurations
-      square3[i][j] = square[i][17-j];
-      //square3[i][j] = square[i][j];
+      square3[i][j] = square[i][j];
       triangle4[i][j] = triangle[i][17-j];
     }
   }
@@ -189,30 +191,28 @@ void setup() {
     // **********This code rotates all the panels into their correct positions (should all be validated now) **********
     for (int j=0; j<SIDE; j++)
     {
-      triangle1[i][j] = triangle4[17-i][j];
-      square2[i][j] = square3[17-i][j];
-      square5[i][j] = square3[j][i];
-      triangle6[i][j] = triangle4[i][17-j];
-      if (triangle4[17-i][17-j]>0)
-      {
-        // the strip on triangle 7 runs from the opposite corner so it has to be handled differently
-        triangle7[i][j] = TRIANGLE + 1 - triangle4[17-i][17-j];
-      }
-      square8[i][j] = square3[17-j][i];
-      square9[i][j] = square3[j][17-i];
-      triangle10[i][j] = triangle4[i][j];
-      triangle11[i][j] = triangle4[17-i][j]; 
-      square12[i][j] = square3[17-j][17-i];
-      triangle13[i][j] = triangle4[17-i][17-j];
-      square14[i][j] = square3[i][17-j];
-      square15[i][j] = square3[i][17-j];
-      triangle16[i][j] = triangle4[i][17-j];
+      triangle1[i][j] = triangle[17-i][17-j];
+      square2[i][j] = square[17-i][j];
+      square5[i][j] = square[j][17-i];
+      triangle6[i][j] = triangle[i][j];
+      //if (triangle[17-i][17-j]>0)
+      // the strip on triangle 7 runs from the opposite corner so it has to be handled differently
+      triangle7[i][j] = TRIANGLE + 1 - triangle[17-i][j];
+      square8[i][j] = square[17-j][17-i];
+      square9[i][j] = square[j][i];
+      triangle10[i][j] = triangle[i][17-j];
+      triangle11[i][j] = triangle[17-i][17-j]; 
+      square12[i][j] = square[17-j][i];
+      triangle13[i][j] = triangle[17-i][j];
+      square14[i][j] = square[17-i][j];
+      square15[i][j] = square[i][17-j];
+      triangle16[i][j] = triangle[i][j];
     }
   }
 
 //*************this is the code that implements masking ***********************
   bool useMasks = true;
-  //useMasks = false;
+  useMasks = false;
   if (useMasks == true)
   {
     for (int k=0; k<(sizeof(mask3)/sizeof(int)); k++)

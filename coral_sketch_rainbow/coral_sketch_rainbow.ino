@@ -1,4 +1,4 @@
-// updated 8/10/2022
+// As of 8/10/2022, I archived all other versions of this code; the multiple versions were getting too confusing.
 
 #include <Adafruit_NeoPixel.h>
 
@@ -32,17 +32,8 @@
 //#endif  // __arm__
 //}
 
-// ************ Define the zig-zag wire paths for square and triangular panels...I think this is fully validated *******
-// or not...so, there are several apparent problems...
-  // first, the entire panel 7 has pixel value 920 for some reason, even though everything else looks generally correct
-  // second, I think all the diagonal panels are horizontally flipped, except panel 7 which is vertically flipped instead
-  // third, not necessarily a mistake but the x/y thing is massively counterintuitive, the way it's currently printing out
-  // i notice the first panel (square 3) is horizontally flipped as well...is that just true of everything?
-
-  // so...this is actually aligned totally differently than the real panel
-  // is it just reversing the y-values, so it's 17-y?  that seems right
+// ************ Define the zig-zag wire paths for square and triangular panels
 int square[18][18] = {
-//int square3[18][18] = {
   {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18},
   {36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19},
   {37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54},
@@ -62,9 +53,7 @@ int square[18][18] = {
   {306, 305, 304, 303, 302, 301, 300, 299, 298, 297, 296, 295, 294, 293, 292, 291, 290, 289},
   {307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324}
 };
-// I need to take a look at how this one is configured
 int triangle[18][18] = {
-//int triangle4[18][18]  = {
   {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 0, 0},
   {31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 0, 0, 0},
   {32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 0, 0, 0, 0},
@@ -84,13 +73,15 @@ int triangle[18][18] = {
   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
+
+// Initialize mapping arrays for all the panels
 int square3[18][18] = {{0}};
 int triangle4[18][18] = {{0}};
-int triangle1[18][18] = {{0}}; // x-flipped
-int square2[18][18] = {{0}}; // x-flipped
-int square5[18][18] = {{0}}; // rotate cw then x-flip
-int triangle6[18][18] = {{0}}; // y-flip
-int triangle7[18][18] = {{0}}; // 
+int triangle1[18][18] = {{0}};
+int square2[18][18] = {{0}};
+int square5[18][18] = {{0}};
+int triangle6[18][18] = {{0}};
+int triangle7[18][18] = {{0}};
 int square8[18][18] = {{0}};
 int square9[18][18] = {{0}};
 int triangle10[18][18] = {{0}};
@@ -102,8 +93,7 @@ int square15[18][18] = {{0}};
 int triangle16[18][18] = {{0}};
 
 
-//******************* These are define the masks for pixels that are covered....it hasn't been validated***********
-//18,36,54,72,90,108,126,144,162,180,198,216,234,252,270,288,306,324
+//******************* These are define the masks for pixels that are covered, but currently there are lots of mistakes*************
 int mask3[] = {1,5,7,8,10,15,16,17,18,19,23,25,26,31,34,37,38,50,52,54,56,60,62,63,64,65,66,67,68,74,75,77,86,87,90,91,93,97,100,101,105,109,110,114,115,120,122,125,
  127,131,138,140,142,149,152,154,155,157,159,162,155,168,171,176,178,179,180,184,196,197,198,199,200,201,204,205,207,208,209,210,212,216,218,219,221,227,232,233,234,
  235,236,237,239,240,241,245,246,248,252,254,255,257,261,266,267,268,269,270,271,272,273,279,290,293,294,295,296,297,299,300,301,302,303,304,305,306,307,308,309,314,
@@ -133,35 +123,15 @@ int layout[4][4] = {
   {3, 7, 11, 15}
 };
 // the cell values refer to indices in the "panels" array
-// should this be the other way 'round, so that we can look up the path position using the panel #?
-int path[16] = {2, 3, 7, 6, 10, 11, 15, 14, 13, 12, 8, 9, 5, 4, 0, 1};
-// i just double checked the inverse path and it seems right...does it ever get used??
+int path[16] = {2, 3, 7, 6, 10, 11, 15, 14, 13, 12, 8, 9, 5, 4, 0, 1}; // the path begins at panel #3 (n+1), heads to #4, and so on, all ending in panel #2
+// in theory this is supposed to map from the (n-1) panel number to the path position, but I don't know if this has ever been used or tested
 int invpath[16] = {14, 15, 0, 1, 13, 12, 3, 2, 10, 11, 4, 5, 9, 8, 7, 6};
-
-// is there a way to make that sparser, though?  that setup would require a ton of blank cells...whereas there are no blanks if we take the opposite approach.
-// there's a bit of a dilemma in that the array would be most compact if we use an always-positive data type...okay so a byte is way to small and an int is plenty big, there is nothing in between
-
-
-// Parameter 1 = number of pixels in strip
-// Parameter 2 = Arduino pin number (most are valid)
-// Parameter 3 = pixel type flags, add together as needed:
-//   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
-//   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
-//   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
-//   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-//   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
-//Adafruit_NeoPixel strip = Adafruit_NeoPixel(109, PIN, NEO_GRB + NEO_KHZ800);
-
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NLEDS, PIN, NEO_GRBW  + NEO_KHZ800);
 
-
-// IMPORTANT: To reduce NeoPixel burnout risk, add 1000 uF capacitor across
-// pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
-// and minimize distance between Arduino and first pixel.  Avoid connecting
-// on a live circuit...if you must, connect GND first.
-
+// if no serial input is found, simply assume you get a constant stream of 255s
 char serialChar = 255;
 
+//this is just for blinking the test LED on the board itself
 unsigned long previousMillis = 0;  
 int ledState = LOW;  
 
@@ -174,10 +144,10 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
-  //Serial.println("hello world");
   for (int i=0; i<SIDE; i++)
   {
-    // **********This code rotates all the panels into their correct positions (should all be validated now) **********
+    // **********This code rotates the software representation of each panel into the correct orientation**********
+    // !!!the orientations have been validated but it's possible a new error was introduced while doing so
     for (int j=0; j<SIDE; j++)
     {
       square3[i][j] = square[i][j];
@@ -186,9 +156,16 @@ void setup() {
       square2[i][j] = square[17-i][j];
       square5[i][j] = square[j][17-i];
       triangle6[i][j] = triangle[i][j];
-      //if (triangle[17-i][17-j]>0)
+      //if (triangle[i][j]>0)
       // the strip on triangle 7 runs from the opposite corner so it has to be handled differently
-      triangle7[i][j] = TRIANGLE + 1 - triangle[17-i][j];
+      // was the above where things went haywire?  I think this is the old code
+       //     if (triangle4[17-i][17-j]>0)
+      //{
+        // the strip on triangle 7 runs from the opposite corner so it has to be handled differently
+        //triangle7[i][j] = TRIANGLE + 1 - triangle4[17-i][17-j];
+      //}
+      // first debug test...take triangle7 off the table
+      //triangle7[i][j] = TRIANGLE + 1 - triangle[17-i][j];
       square8[i][j] = square[17-j][17-i];
       square9[i][j] = square[j][i];
       triangle10[i][j] = triangle[i][17-j];
@@ -200,10 +177,8 @@ void setup() {
       triangle16[i][j] = triangle[i][j];
     }
   }
-
 //*************this is the code that implements masking ***********************
-  bool useMasks = true;
-  useMasks = false;
+  bool useMasks = false;
   if (useMasks == true)
   {
     for (int k=0; k<(sizeof(mask3)/sizeof(int)); k++)
@@ -260,7 +235,7 @@ void setup() {
       }
     }
   }
-  // ***** This copies by value to the panels array...note that it's not by reference and any further changes will have no effect *****
+  // ***** This copies by value to the panels array...note that it's not by value, not reference, and any further changes will have no effect *****
   memcpy(panels[0], triangle1, sizeof(panels[0]));
   memcpy(panels[1], square2, sizeof(panels[0]));
   memcpy(panels[2], square3, sizeof(panels[0]));
@@ -278,7 +253,7 @@ void setup() {
   memcpy(panels[14], square15, sizeof(panels[0]));
   memcpy(panels[15], triangle16, sizeof(panels[0]));
 
-  //**************this code maps the pixel numbers into one long chain (validated) ***********
+  //**********this code maps the values in the panels array to pixel numbers, so when you look at a position within the array you can see which pixel in the chain it corresponds to (validated)
   int maxpixel = 0;
   int tally =0;
   // for each panel...
@@ -318,6 +293,10 @@ void setup() {
 }
 
 // enumerate patterns, which is the top-level choice
+enum Pattern {RAINBOW, TEST};
+
+
+
 int timer = 0;
 float health = 1.0;
 int counter = 0;
@@ -335,9 +314,19 @@ void loop() {
     }
     digitalWrite(LED_BUILTIN, ledState);
   }
-  // we probably need a better way to choose patterns but this will do for now
-  traverse_grid();
+  
+  // at this stage, we probably want an option to choose which pattern we're showing...right now there's just the main rainbow, but it would be nice to have some debugging patterns as well
+  static Pattern activePattern = RAINBOW;
+  if (activePattern == RAINBOW)
+  {
+    traverse_grid();
+  }
+  else if activePattern == TEST)
+  {
+    
+  }
   strip.show();
+  // I'm guessing 6 is a magic number that makes the speed work well?
   counter += 6;
 }
 // get health data from the serial connection
@@ -362,8 +351,8 @@ void traverse_grid()
         // this is where the actual pattern is defined...maybe should structure this differently
         int angle = xy2angle(i,j);
         int color = rainbow(angle);
-        //strip.setPixelColor(pixel, color);
-        strip.setPixelColor(pixel, strip.Color(0,0,0));
+        strip.setPixelColor(pixel, color);
+        //strip.setPixelColor(pixel, strip.Color(0,0,0));
       }
     }
   }
@@ -424,3 +413,81 @@ uint32_t wheel(byte WheelPos) {
   WheelPos -= 170;
   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
+
+// This code was in another version...I think it prints to serial the pixel mapping
+
+//String msg = "";
+//   //for this kind of thing, we need to nest x loops within y loops to make the display intuitively match cartesian coordinates
+//  for (int j=0; j<(4*SIDE); j++)
+//  {
+//    msg = String(j) + String(": ");
+//    for (int i=0; i<(4*SIDE); i++)
+//    {
+//      int i0 = i/SIDE;
+//      int j0 = j/SIDE;
+//      int i1 = i - i0*SIDE;
+//      int j1 = j - j0*SIDE;
+//      int pixel = panels[layout[i0][j0]][i1][j1] - 1;
+//      String spix = (String(pixel)+String("     ")).substring(0,5);
+//      
+//      msg = msg + spix;
+//    }
+//    Serial.println(msg);
+//    msg = "";
+
+
+// **** This was an older test that linearly addresses the pixels
+//void linear_test(int color) {
+//  int c = color;
+//  int pixel;
+//  bool alternateColors = false;
+//  for (int i=0; i<NPIXELS; i++)
+//  {
+//    int ii = i+1;
+//    if (alternateColors == true)
+//     {
+//      if (ii%10 == 1)
+//      {
+//        c = strip.Color(0,0,0,255);
+//      }
+//      else if (ii%10 == 2)
+//      {
+//        c = strip.Color(255,0,0);
+//      }
+//      else if (ii%10 == 3)
+//      {
+//        c = strip.Color(255,255,0);
+//      }
+//      else if (ii%10 == 4)
+//      {
+//        c = strip.Color(0,255,0);
+//      }
+//      else if (ii%10 == 5)
+//      {
+//        c = strip.Color(0,0,0);
+//      }
+//      else if (ii%10 == 6)
+//      {
+//        c = strip.Color(0,255,255);
+//      }
+//      else if (ii%10 == 7)
+//      {
+//        c = strip.Color(0,0,255);
+//      }
+//      else if (ii%10 == 8)
+//      {
+//        c = strip.Color(255,0,255);
+//      }
+//      else if (ii%10 == 9)
+//      {
+//        c = strip.Color(55,0,0);
+//      }
+//      else if (ii%10 == 0)
+//      {
+//        c = strip.Color(0,55,0);
+//      }
+//    }
+//    strip.setPixelColor(i, c);
+//  }
+//  strip.show();
+//}

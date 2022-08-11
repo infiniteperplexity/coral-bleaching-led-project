@@ -165,7 +165,9 @@ void setup() {
         //triangle7[i][j] = TRIANGLE + 1 - triangle4[17-i][17-j];
       //}
       // first debug test...take triangle7 off the table
-      //triangle7[i][j] = TRIANGLE + 1 - triangle[17-i][j];
+      if (triangle[17-i][j]>0) {
+        triangle7[i][j] = TRIANGLE + 1 - triangle[17-i][j];
+      }
       square8[i][j] = square[17-j][17-i];
       square9[i][j] = square[j][i];
       triangle10[i][j] = triangle[i][17-j];
@@ -321,7 +323,7 @@ void loop() {
   {
     traverse_grid();
   }
-  else if activePattern == TEST)
+  else if (activePattern == TEST)
   {
     
   }

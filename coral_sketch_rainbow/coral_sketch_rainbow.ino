@@ -316,7 +316,7 @@ void loop() {
     }
     digitalWrite(LED_BUILTIN, ledState);
   }
-  
+  getSerial();
   // at this stage, we probably want an option to choose which pattern we're showing...right now there's just the main rainbow, but it would be nice to have some debugging patterns as well
   static Pattern activePattern = RAINBOW;
   if (activePattern == RAINBOW)

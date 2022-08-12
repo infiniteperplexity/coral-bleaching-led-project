@@ -314,7 +314,7 @@ void loop() {
     } else {
       ledState = LOW;
     }
-    digitalWrite(LED_BUILTIN, ledState);
+    //digitalWrite(LED_BUILTIN, ledState);
   }
   getSerial();
   // at this stage, we probably want an option to choose which pattern we're showing...right now there's just the main rainbow, but it would be nice to have some debugging patterns as well
@@ -337,8 +337,10 @@ void getSerial()
   if (Serial.available() > 0) {
     serialChar = Serial.read();
     health = byte(serialChar)/255.0;
+    
     //Serial
   }
+  //health = 0.0;
 }
 
 void traverse_grid()
@@ -353,7 +355,8 @@ void traverse_grid()
         // this is where the actual pattern is defined...maybe should structure this differently
         int angle = xy2angle(i,j);
         int color = rainbow(angle);
-        strip.setPixelColor(pixel, color);
+        //strip.setPixelColor(pixel, color);
+        bleachedDispatch(pixel, color);
         //strip.setPixelColor(pixel, strip.Color(0,0,0));
       }
     }

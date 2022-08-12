@@ -151,7 +151,6 @@ void draw(){
     try
     {
       arduino.write(Math.round(255*(1.0-bleach(dhw))));
-      //arduino.write(0);
     }
     catch(Exception e)
     {

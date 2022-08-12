@@ -8,8 +8,8 @@
 #endif
 
 #define PIN 6
-#define NPIXELS 1000
-#define NLEDS 3680
+#define NLEDS 10
+//3680
 #define TRIANGLE 136
 #define SQUARE 324
 #define SIDE 18
@@ -395,10 +395,12 @@ void bleachedDispatch(uint16_t pixel, uint32_t color)
     byte r = (color >> 16);
     byte g = (color >>  8);
     byte b = (uint8_t) color;
-    byte r2 = r + (255 - r) * bleached;
-    byte g2 = g + (255 - g) * bleached;
-    byte b2 = b + (255 - b) * bleached;
-    strip.setPixelColor(pixel, strip.Color(r2, g2, b2));
+    //byte r2 = r + (255 - r) * bleached;
+    //byte g2 = g + (255 - g) * bleached;
+    //byte b2 = b + (255 - b) * bleached;
+    //strip.setPixelColor(pixel, strip.Color(r2, g2, b2));
+    // this should save power and it might even look better
+    strip.setPixelColor(pixel, strip.Color(health * r, health * g, health * b, bleached * 255));
 }
 
 // Input a value 0 to 255 to get a color value.

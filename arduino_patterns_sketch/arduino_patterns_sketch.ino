@@ -390,7 +390,6 @@ int rainbow(int angle)
   return color;
 }
 
-
 // change the saturation based on the health of the coral
 void bleachedDispatch(uint16_t pixel, uint32_t color)
 {

@@ -451,7 +451,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(NLEDS, PIN, NEO_GRBW  + NEO_KHZ800);
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(9600);
+  //Serial.begin(9600); // I think this is literally ignored for Teensy
   strip.begin();
   strip.setBrightness(50);
   strip.show(); // Initialize all pixels to 'off' (that's what the comment says; do I actually do this?)
@@ -473,12 +473,13 @@ void loop() {
   }
   float health = getHealth(); 
   rainbow(health); // could replace with some other pattern
+  static int p = 0;
   strip.show();
-  // I'm guessing 6 is a magic number that makes the speed work well?
+  p++;
   
 }
 // get health data from the serial connection...I don't remember whether I did a non-stateless version because I wanted to cache it or because I was lazy.
-float getHealth()
+float getHealthOld() // this version tends to accumulate too many values in the buffer
 {
   if (Serial.available() > 0) {
     char serialChar = Serial.read();
@@ -487,6 +488,16 @@ float getHealth()
     return 1.0;
   }
 }
+
+float getHealth() // this version empties the buffer as fast as possible to avoid backing up the sender
+{
+  char serialChar = char(255);
+  while (Serial.available() > 0) {
+    serialChar = Serial.read();
+  }
+  return byte(serialChar)/255.0;
+}
+
 // change the saturation based on the health of the coral
 float bleach(float hlth, uint32_t color)
 {
@@ -514,7 +525,7 @@ void rainbow(float hlth)
     for (int j=0; j<(4*SIDE); j++)
     {
       int pixel = xy2pixel(i,j);
-      if (pixel >= -1)
+      if (pixel >= -1 && pixel <= NLEDS)
       {
         int angle = rainbow_xy2angle(i,j);
         int color = rainbow_angle2color(angle, counter);

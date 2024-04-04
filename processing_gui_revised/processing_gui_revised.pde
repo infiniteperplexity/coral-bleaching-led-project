@@ -2,6 +2,9 @@ import processing.serial.*;
 Serial arduino;
 //String portName = "/dev/ttyACM0";
 String portName;
+//int BAUD = 9600;
+int BAUD = 115200;
+//int BAUD = 256000;
 // We need to cut down on some of these "magic numbers"
 String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 int[] years = {0, 282, 647, 1012, 1378, 1743, 2108, 2473, 2839, 3204, 3569, 3934, 4300, 4665, 5030, 5395, 5761, 6126, 6491,
@@ -22,7 +25,8 @@ PFont lcdTiny;
 PFont lcdFont;
 PFont lcdSmall;
 int index = 0;
-int wait = 50;
+//int wait = 50;
+int wait = 100;
 long last = 0;
 PShape world;
 PShape button;
@@ -59,7 +63,7 @@ void setup(){
   {
     portName = Serial.list()[0];
     print(portName);
-    arduino = new Serial(this, portName, 9600);
+    arduino = new Serial(this, portName, BAUD);
   }
   catch(Exception e)
   {
@@ -160,7 +164,7 @@ void draw(){
       arc(342, 305, 80+2*sin(tick), 80+2*sin(tick), 2*i*unit, (2*i+0.5)*unit );
     }
     
-    
+    last = millis();
     try
     {
       arduino.write(Math.round(255*(1.0-bleach(dhw))));
@@ -170,7 +174,7 @@ void draw(){
       ;
     }
     index = (index + bump) % t.getRowCount();
-    last = millis();
+    //last = millis();
     
   }
   //delay(wait);

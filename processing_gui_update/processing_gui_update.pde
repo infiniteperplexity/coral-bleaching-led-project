@@ -118,6 +118,8 @@ void draw(){
     circle(1795, 370+50, 12);
     fill(0, 255, 0);
     text(nf(1.8*temp+32,2,2), 1450, 450+50);
+    text(" F", 1780, 450+50);
+    
     tick += 1;
     for (int i = 0; i < reefs.size(); i++)
     {

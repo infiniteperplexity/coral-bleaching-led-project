@@ -2,9 +2,16 @@ import processing.serial.*;
 Serial arduino;
 //String portName = "/dev/ttyACM0";
 String portName;
+// We need to cut down on some of these "magic numbers"
 String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 int[] years = {0, 282, 647, 1012, 1378, 1743, 2108, 2473, 2839, 3204, 3569, 3934, 4300, 4665, 5030, 5395, 5761, 6126, 6491,
-                6856, 7222, 7587, 7952, 8317, 8683, 9048, 9413, 9778, 10144, 10509, 10874, 11239, 11605, 11970, 12335, 12700};
+                6856, 7222, 7587, 7952, 8317, 8683, 9048, 9413, 9778, 10144, 10509, 10874, 11239, 11605, 11970, 12335, 12700}; // I suspect these are the observation numbers where the years roll over
+
+int world_x;
+int world_y;
+int world_width;
+int world_height;
+
 PFont font;
 PFont lcdTiny;
 PFont lcdFont;
@@ -12,7 +19,7 @@ PFont lcdSmall;
 int index = 0;
 int wait = 50;
 long last = 0;
-PShape shape;
+PShape world;
 PShape button;
 ArrayList<Reef> reefs = new ArrayList<Reef>();
 int tick;
@@ -24,6 +31,7 @@ boolean bookmarks = true;
 //https://pae-paha.pacioos.hawaii.edu/erddap/griddap/dhw_5km.csv?CRW_DHW[(2020-01-01T12:00:00Z):1:(2020-05-17T12:00:00Z)][(17.175):1:(17.175)][(-87.325):1:(-87.325)],CRW_SST[(2020-01-01T12:00:00Z):1:(2020-05-17T12:00:00Z)][(17.175):1:(17.175)][(-87.325):1:(-87.325)]
 
 void setup(){
+  // I'm pretty sure these magic numbers are related to longitude and latitude
   reefs.add(new Reef(2055, 1160, "Great Barrier Reef", "great"));
   //reefs.add(new Reef(1289, 852, "New Caledonia Barrier Reef", "newcaledonia"));
   reefs.add(new Reef(1885, 1000, "Tubbataha Reef", "tubbataha"));
@@ -32,10 +40,11 @@ void setup(){
   reefs.add(new Reef(515, 895, "Florida Keys Reef Tract", "florida"));
   //reefs.add(new Reef(467, 942, "Belize Barrier Reef", "belize"));
   reefs.add(new Reef(455, 955, "Belize Barrier Reef", "belize"));
-  shape = loadShape("Continents.svg");
+  world = loadShape("Continents.svg");
   //button = loadShape("button.svg");
   button = loadShape("button_fixed.svg"); // fixed a broken SVG file
-  fullScreen();
+  //fullScreen();
+  size(2000, 2000);
   font = loadFont("ArialMT-48.vlw");
   //DS-Digital by Dusit Supasawat
   lcdTiny = createFont("DS-DIGI.TTF", 36);
@@ -77,9 +86,9 @@ void draw(){
     stroke(0,0,0);
     strokeWeight(1);
     //// World Map
-    shape.disableStyle();
+    world.disableStyle();
     fill(0,255,00);
-    shape(shape,-125,550, 2500, 1000);
+    shape(world,-125,550, 2500, 1000); // these must be the size I guess?
     fill(0, 255, 0);
     
     //// Text
@@ -126,7 +135,7 @@ void draw(){
       pushMatrix();
       translate(r.X,r.Y);
       rotate(4*radians(tick));
-      shape.disableStyle();
+      world.disableStyle();
       fill(0,0,0);
       shape(button,-radius,-radius,2*radius,2*radius);
       popMatrix();

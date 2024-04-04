@@ -7,10 +7,15 @@ String[] months = { "January", "February", "March", "April", "May", "June", "Jul
 int[] years = {0, 282, 647, 1012, 1378, 1743, 2108, 2473, 2839, 3204, 3569, 3934, 4300, 4665, 5030, 5395, 5761, 6126, 6491,
                 6856, 7222, 7587, 7952, 8317, 8683, 9048, 9413, 9778, 10144, 10509, 10874, 11239, 11605, 11970, 12335, 12700}; // I suspect these are the observation numbers where the years roll over
 
-int world_x;
-int world_y;
-int world_width;
-int world_height;
+// might vary per screen...maroon laptop is looking okay at 0.75, 200, 0.
+float SCALE = 0.75;
+int TRANSLATE_X = 200;
+int TRANSLATE_Y = 0;
+
+int world_x = -125;
+int world_y = 550;
+int world_width = 2500;
+int world_height = 1000;
 
 PFont font;
 PFont lcdTiny;
@@ -43,8 +48,7 @@ void setup(){
   world = loadShape("Continents.svg");
   //button = loadShape("button.svg");
   button = loadShape("button_fixed.svg"); // fixed a broken SVG file
-  //fullScreen();
-  size(2000, 2000);
+  fullScreen();
   font = loadFont("ArialMT-48.vlw");
   //DS-Digital by Dusit Supasawat
   lcdTiny = createFont("DS-DIGI.TTF", 36);
@@ -64,6 +68,8 @@ void setup(){
   }
 }
 void draw(){
+  scale(SCALE, SCALE);
+  translate(TRANSLATE_X, TRANSLATE_Y);
   long now = millis();
   if (now - last >= wait)
   {
@@ -88,7 +94,7 @@ void draw(){
     //// World Map
     world.disableStyle();
     fill(0,255,00);
-    shape(world,-125,550, 2500, 1000); // these must be the size I guess?
+    shape(world,world_x,world_y, world_width, world_height); // these must be the size I guess?
     fill(0, 255, 0);
     
     //// Text
@@ -217,19 +223,24 @@ void keyPressed()
 }
 
 void mousePressed() {
+  //int effective_x = int(SCALE*(mouseX - TRANSLATE_X));
+  //int effective_x = int((mouseX - TRANSLATE_X)/SCALE);
+  int effective_x = int(mouseX/SCALE) - TRANSLATE_X;
+  int effective_y = int(mouseY/SCALE) - TRANSLATE_Y;
+  
   for (int i = 0; i < reefs.size(); i++)
   {
     Reef r = reefs.get(i);
-    if (Math.sqrt((mouseX - r.X)*(mouseX - r.X) + (mouseY - r.Y)*(mouseY - r.Y))<30)
+    if (Math.sqrt((effective_x - r.X)*(effective_x- r.X) + (effective_y - r.Y)*(effective_y- r.Y))<30)
     {
       selected = i;
     }
   }
-  if (mouseX >= 214-45 && mouseX <= 214+45 && mouseY >= 305-45 && mouseY <= 305+45)
+  if (effective_x>= 214-45 && effective_x <= 214+45 && effective_y >= 305-45 && effective_y <= 305+45)
   {
     index = years[Math.max(0,getYear()-1)];
   }
-  else if (mouseX >= 342-45 && mouseX <= 342+45 && mouseY >= 305-45 && mouseY <=305+45)
+  else if (effective_x >= 342-45 && effective_x <= 342+45 && effective_y >= 305-45 && effective_y <=305+45)
   {
     index = years[Math.min(getYear()+1, years.length-1)];
   }

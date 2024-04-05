@@ -473,10 +473,7 @@ void loop() {
   }
   float health = getHealth(); 
   rainbow(health); // could replace with some other pattern
-  static int p = 0;
-  strip.show();
-  p++;
-  
+  strip.show(); 
 }
 // get health data from the serial connection...I don't remember whether I did a non-stateless version because I wanted to cache it or because I was lazy.
 float getHealthOld() // this version tends to accumulate too many values in the buffer
@@ -495,8 +492,8 @@ float getHealth() // this version empties the buffer as fast as possible to avoi
   while (Serial.available() > 0) {
     serialChar = Serial.read();
   }
-  return byte(serialChar)/255.0;
-  //return 100.0/255.0;
+  //return byte(serialChar)/255.0;
+  return 175.0/255.0;
 }
 
 // change the saturation based on the health of the coral
@@ -513,10 +510,9 @@ float bleach(float hlth, uint32_t color)
 
 float bleach_formula_0(float hlth, byte r, byte g, byte b)
 {
+  // there's a weirdly sharp boundary between green and blue, and between purple and red...almost as if cyan and magenta don't exist.  The problem does not exist at all for yellow.
   return strip.Color(hlth * r, hlth * g, hlth * b, (1.0-hlth)* 255);
 }
-
-
 
 // *** map an x,y coordinate to a pixel
 int xy2pixel(int x, int y)
@@ -527,7 +523,7 @@ int xy2pixel(int x, int y)
 // our one and only pattern for now
 void rainbow(float hlth)
 {
-  static int counter =   0;
+  static int counter = 0;
   for (int i=0; i<(4*SIDE); i++)
   {
     for (int j=0; j<(4*SIDE); j++)
@@ -535,39 +531,40 @@ void rainbow(float hlth)
       int pixel = xy2pixel(i,j);
       if (pixel >= -1 && pixel <= NLEDS)
       {
-        int angle = rainbow_xy2angle(i,j);
+        double angle = rainbow_xy2angle(i,j);
         int color = rainbow_angle2color(angle, counter);
         color = bleach(hlth, color);
         strip.setPixelColor(pixel, color);
       }
     }
   }
-  counter += 6;
+  counter += 10;
 }
 
 // *** map an x,y coordinate to an angle (relative to the center)
-double rainbow_xy2angle(int y, int x)
+double rainbow_xy2angle(int x, int y) // why is this y, x rather than x, y?
 {
-  return (atan2(y-2*SIDE, x-2*SIDE)*180)/M_PI;
+  return atan2(y-2*SIDE, x-2*SIDE);
 }
 
-int rainbow_angle2color(int angle, int cntr)
+int rainbow_angle2color(double angle, float cntr)
 {
-  int pos = map((angle + cntr)%360, 0, 360, 0, 255);
-  int color = wheel(pos);
-  return color;
-}
-
-// swiped from the Adafruit test pattern
-uint32_t wheel(byte WheelPos) {
-  WheelPos = 255 - WheelPos;
-  if(WheelPos < 85) {
-    return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  // this does still discretize the return value, which means the bleaching takes place on discretized values.  I'm almost certain that doesn't matter.
+  double wheel = 384.0*angle/M_PI;
+  wheel += cntr;
+  while (wheel < 0) {
+    wheel += 768;
   }
-  if(WheelPos < 170) {
-    WheelPos -= 85;
-    return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  while (wheel >= 768) {
+    wheel -= 768;
   }
-  WheelPos -= 170;
-  return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+  if (wheel < 256) { // red -> magenta -> blue
+    return strip.Color(255 - wheel, 0, wheel);
+  }
+  if (wheel < 512) { // blue -> cyan -> green
+    wheel -= 256;
+    return strip.Color(0, wheel, 255 - wheel);
+  } // green -> yellow -> red
+  wheel -= 512;
+  return strip.Color(wheel, 255 - wheel, 0);
 }

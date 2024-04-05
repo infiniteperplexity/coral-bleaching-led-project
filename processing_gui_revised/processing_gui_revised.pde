@@ -167,7 +167,10 @@ void draw(){
     last = millis();
     try
     {
-      arduino.write(Math.round(255*(1.0-bleach(dhw))));
+      int health = Math.round(255*(1.0-bleach(dhw)));
+      health = 175;
+      //println(health);
+      arduino.write(health);
     }
     catch(Exception e)
     {

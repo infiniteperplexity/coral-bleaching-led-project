@@ -496,16 +496,24 @@ float getHealth() // this version empties the buffer as fast as possible to avoi
     serialChar = Serial.read();
   }
   return byte(serialChar)/255.0;
+  //return 100.0/255.0;
 }
 
 // change the saturation based on the health of the coral
 float bleach(float hlth, uint32_t color)
 {
-    float bleached = 1.0 - hlth;
+    //float bleached = 1.0 - hlth;
     byte r = (color >> 16);
     byte g = (color >>  8);
     byte b = (uint8_t) color;
-    return strip.Color(hlth * r, hlth * g, hlth * b, bleached * 255);
+    return bleach_formula_0(hlth, r, g, b);
+    //return strip.Color(hlth * r, hlth * g, hlth * b, bleached * 255);
+    //return strip.Color(hlth * r, hlth * g, hlth * b, 0.1*bleached * 255);
+}
+
+float bleach_formula_0(float hlth, byte r, byte g, byte b)
+{
+  return strip.Color(hlth * r, hlth * g, hlth * b, (1.0-hlth)* 255);
 }
 
 

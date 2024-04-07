@@ -475,16 +475,6 @@ void loop() {
   rainbow(health); // could replace with some other pattern
   strip.show(); 
 }
-// get health data from the serial connection...I don't remember whether I did a non-stateless version because I wanted to cache it or because I was lazy.
-float getHealthOld() // this version tends to accumulate too many values in the buffer
-{
-  if (Serial.available() > 0) {
-    char serialChar = Serial.read();
-    return byte(serialChar)/255.0;
-  } else {
-    return 1.0;
-  }
-}
 
 float getHealth() // this version empties the buffer as fast as possible to avoid backing up the sender
 {
@@ -492,26 +482,28 @@ float getHealth() // this version empties the buffer as fast as possible to avoi
   while (Serial.available() > 0) {
     serialChar = Serial.read();
   }
-  //return byte(serialChar)/255.0;
-  return 175.0/255.0;
+  return byte(serialChar)/255.0;
+  //return 200.0/255.0;
 }
 
 // change the saturation based on the health of the coral
 float bleach(float hlth, uint32_t color)
 {
-    //float bleached = 1.0 - hlth;
     byte r = (color >> 16);
     byte g = (color >>  8);
     byte b = (uint8_t) color;
-    return bleach_formula_0(hlth, r, g, b);
-    //return strip.Color(hlth * r, hlth * g, hlth * b, bleached * 255);
-    //return strip.Color(hlth * r, hlth * g, hlth * b, 0.1*bleached * 255);
+    return bleach_formula_pow_blue(hlth, r, g, b);
 }
 
-float bleach_formula_0(float hlth, byte r, byte g, byte b)
+float bleach_formula(float hlth, byte r, byte g, byte b)
 {
-  // there's a weirdly sharp boundary between green and blue, and between purple and red...almost as if cyan and magenta don't exist.  The problem does not exist at all for yellow.
   return strip.Color(hlth * r, hlth * g, hlth * b, (1.0-hlth)* 255);
+  
+}
+
+float bleach_formula_pow_blue(float hlth, byte r, byte g, byte b)
+{ // the blue LEDs don't seem to handle dimming in the same way as the red and green ones do, at least to the human eye...this seems to be a reasonable workaround.
+  return strip.Color(hlth * r, hlth * g, pow(hlth, 4) * b, (1.0-hlth)* 255);
 }
 
 // *** map an x,y coordinate to a pixel

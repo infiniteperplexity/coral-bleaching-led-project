@@ -15,8 +15,7 @@ int BAUD = 115200;
 ArrayList<Reef> reefs = new ArrayList<Reef>();
 int selected = 0;
 String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-int[] years = {0, 282, 647, 1012, 1378, 1743, 2108, 2473, 2839, 3204, 3569, 3934, 4300, 4665, 5030, 5395, 5761, 6126, 6491,
-                6856, 7222, 7587, 7952, 8317, 8683, 9048, 9413, 9778, 10144, 10509, 10874, 11239, 11605, 11970, 12335, 12700}; // I suspect these are the observation numbers where the years roll over
+int[] years = {};
 
 //*** Timing ***//
 int index = 0;
@@ -51,6 +50,21 @@ void setup(){
   reefs.add(new Reef(1320, 920, "Red Sea Reef System", "redsea"));
   reefs.add(new Reef(515, 895, "Florida Keys Reef Tract", "florida"));
   reefs.add(new Reef(455, 955, "Belize Barrier Reef", "belize"));
+  
+  // locate the year breaks
+  Table t = reefs.get(selected).Data;
+  TableRow tr = t.getRow(0);
+  int previous_year = tr.getInt(0);
+  years = append(years, 0);
+  for (int i=1; i<t.getRowCount(); i++)
+  {
+    tr = t.getRow(i);
+    int year = tr.getInt(0);
+    if (year!=previous_year) {
+      years = append(years, i);
+    }
+    previous_year = year;
+  }
 }
 
 void draw(){
@@ -69,11 +83,10 @@ void draw(){
     index = (index <= t.getRowCount()) ? index : 0; // prevents errors when switching reefs if the data series are different lengths
     TableRow tr = t.getRow(index);
     String name = reefs.get(selected).Name;
-    float dhw = tr.getFloat(3);
-    float temp = tr.getFloat(4);
-    String date = tr.getString(0).substring(0,7);
-    int year = Integer.valueOf(date.substring(0,4));
-    String month = months[Integer.valueOf(date.substring(5,7))-1];
+    float dhw = tr.getFloat(5);
+    float temp = tr.getFloat(6);
+    int year = tr.getInt(0);
+    String month = months[tr.getInt(1)-1];
     
     // *** Draw the interface elements
     background(0, 0, 0);
@@ -181,7 +194,7 @@ class Reef
     X = x;
     Y = y;
     Name = name;
-    Data = loadTable(fname +".csv", "header");
+    Data = loadTable(fname +"_all.csv", "header");
   }
 }
 

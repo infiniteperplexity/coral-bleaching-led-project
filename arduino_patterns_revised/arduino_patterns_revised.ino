@@ -478,12 +478,27 @@ void loop() {
 
 float getHealth() // this version empties the buffer as fast as possible to avoid backing up the sender
 {
+  
   char serialChar = char(255);
   while (Serial.available() > 0) {
     serialChar = Serial.read();
   }
-  return byte(serialChar)/255.0;
-  //return 200.0/255.0;
+  //return 200.0/255.0;  // testing LED fade
+  float health = byte(serialChar)/255.0;
+  // return health;
+  // the following logic forces the fading to be less choppy...let's presume that even when coral is stressed, it takes a while to fade.
+  static float prev_health = 1.0;
+  float health_delta = health - prev_health;
+  Serial.println(health_delta);
+  //float max_delta = 0.1;
+  float max_delta = 1.0; // no effective limit for first test
+  if (health_delta > max_delta) {
+    health_delta = max_delta;
+  } else if (health_delta < -max_delta) {
+    health_delta = -max_delta;
+  }
+  prev_health = prev_health + health_delta;
+  return prev_health;	
 }
 
 // change the saturation based on the health of the coral

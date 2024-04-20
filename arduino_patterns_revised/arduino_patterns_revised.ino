@@ -451,7 +451,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(NLEDS, PIN, NEO_GRBW  + NEO_KHZ800);
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
-  //Serial.begin(9600); // I think this is literally ignored for Teensy
+  Serial.begin(9600); // I think this is literally ignored for Teensy
   strip.begin();
   strip.setBrightness(50);
   strip.show(); // Initialize all pixels to 'off' (that's what the comment says; do I actually do this?)
@@ -478,7 +478,6 @@ void loop() {
 
 float getHealth() // this version empties the buffer as fast as possible to avoid backing up the sender
 {
-  
   char serialChar = char(255);
   while (Serial.available() > 0) {
     serialChar = Serial.read();
@@ -489,9 +488,13 @@ float getHealth() // this version empties the buffer as fast as possible to avoi
   // the following logic forces the fading to be less choppy...let's presume that even when coral is stressed, it takes a while to fade.
   static float prev_health = 1.0;
   float health_delta = health - prev_health;
-  Serial.println(health_delta);
-  //float max_delta = 0.1;
-  float max_delta = 1.0; // no effective limit for first test
+  //Serial.println(health_delta);
+  float max_delta = 0.025; // 0.025 honestly looks fine I think?
+  // 1.0 means the parameter is effective unused.
+  // 0.1 cuts off only very large changes and probably looks fine.
+  // 0.05 is also probably okay.
+  // 0.01 makes it so it never reaches peak levels of bleaching in early years at least, and maybe even in later years.
+  //// I should take some notes about what time periods to look at.
   if (health_delta > max_delta) {
     health_delta = max_delta;
   } else if (health_delta < -max_delta) {

@@ -907,11 +907,12 @@ void loop() {
     }
     digitalWrite(LED_BUILTIN, ledState);
   }
-  //float health = getHealth(); 
-  float health = cycleHealth();
-  //float health = 1.0;
-  //rainbow(health, 10);
-  all_black();
+  float health = getHealth(); 
+  //health = cycleHealth();
+  //health = 1.0;
+  rainbow(health, 10);
+  //locator_grid();
+  //low_power();
   strip.show(); 
 }
 
@@ -1007,6 +1008,67 @@ int xy2pixel(int x, int y, bool masked)
   return pixel_map[x][y]-1; // trivial function once we have the array, but in case we have to change it some day...
 }
 
+// *** This should be safe to leave unattended even with a power supply that's a bit too small.
+void low_power() {
+  static int counter = 0;
+  for (int i=0; i<(4*SIDE); i++)
+  {
+    for (int j=0; j<(4*SIDE); j++)
+    {
+      int pixel = xy2pixel(i,j, true); // last parameter is whether to mask blocked LEDs
+      int color;
+      if (pixel > -1) {
+        if (i*SIDE + j == counter) {
+          int wheel = counter;
+          while (wheel < 0) {
+            wheel += 768;
+          }
+          while (wheel >= 768) {
+            wheel -= 768;
+          }
+          if (wheel < 256) { // red -> magenta -> blue
+            color = strip.Color(255 - wheel, 0, wheel);
+          }
+          if (wheel < 512) { // blue -> cyan -> green
+            wheel -= 256;
+            color = strip.Color(0, wheel, 255 - wheel);
+          } else {// green -> yellow -> red
+            wheel -= 512;
+            color = strip.Color(wheel, 255 - wheel, 0);
+          }
+          strip.setPixelColor(pixel, color);
+        }
+        else {
+          strip.setPixelColor(pixel, strip.Color(0,0,0,0));
+        }
+      }
+    }
+  }
+  counter = (counter + 1) % (72*72);
+}
+
+// used for locating individual pixels while programming
+void locator_grid() {
+  for (int i=0; i<(4*SIDE); i++)
+  {
+    for (int j=0; j<(4*SIDE); j++)
+    {
+      int pixel = xy2pixel(i,j, true); // last parameter is whether to mask blocked LEDs
+      int color;
+      if (pixel > -1) {
+        if (i%25==0 || j%25==0)
+          strip.setPixelColor(pixel, 255, 0, 0, 0);
+        else if (i%10==0 && j%10==0)
+          strip.setPixelColor(pixel, 255, 255, 0, 0);
+        else if (i%5==0 && j%5==0)
+          strip.setPixelColor(pixel, 0, 0, 255, 0);
+        else
+          strip.setPixelColor(pixel, 0, 128, 0, 0);
+      }
+    }
+  }
+}
+
 // our one and only pattern for now
 void rainbow(float hlth, int speed)
 {
@@ -1030,17 +1092,6 @@ void rainbow(float hlth, int speed)
   counter += speed;
 }
 
-void all_black()
-{
-  for (int i=0; i<(4*SIDE); i++)
-  {
-    for (int j=0; j<(4*SIDE); j++)
-    {
-      int pixel = xy2pixel(i,j, true); // last parameter is whether to mask blocked LEDs
-      strip.setPixelColor(pixel, strip.Color(0,0,0,0));
-    }
-  }
-}
 // *** map an x,y coordinate to an angle (relative to the center)
 double rainbow_xy2angle(int x, int y) // why is this y, x rather than x, y?
 {

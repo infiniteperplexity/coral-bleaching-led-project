@@ -39,11 +39,13 @@ void setup(){
   try {
     portName = Serial.list()[0];
     arduino = new Serial(this, portName, BAUD);
+    println("Successfully initialized Serial port");
   } catch(Exception e) {
     System.err.println("Error initializing Serial port!\nPlease check connections and port settings");
   }
   
   // Set up reefs and point to data
+  //reefs.add(new Reef(2055, 1160, "Fake Barrier Reef", "synthetic"));
   reefs.add(new Reef(2055, 1160, "Great Barrier Reef", "great"));
   //reefs.add(new Reef(1289, 852, "New Caledonia Barrier Reef", "newcaledonia"));
   reefs.add(new Reef(1885, 1000, "Tubbataha Reef", "tubbataha"));
@@ -172,14 +174,16 @@ void draw(){
 
 // ** Convert DHW to a reasonable measure of health (did I actually validate that this is reasonable?) **// 
 float bleach(float dhw) {
+  //return 0.2*dhw;
   if (dhw <= 1) {
     return 0.2*dhw;
   } else if (dhw <= 4) {
-    return 0.2 + 0.2*(dhw-1);
+    return 0.2 + 0.2*(dhw-1); 
   } else if (dhw <= 8) {
     return 0.8 + (dhw-4)*0.05;
   }
   return 1;
+  
 }
 
 // ** Reef object knows how to store name and location, and load data **//
